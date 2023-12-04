@@ -1,10 +1,8 @@
 package cn.iocoder.yudao.module.system.service.dict;
 
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 
 import java.util.Collection;
@@ -20,17 +18,17 @@ public interface DictDataService {
     /**
      * 创建字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param createReqVO 字典数据信息
      * @return 字典数据编号
      */
-    Long createDictData(DictDataCreateReqVO reqVO);
+    Long createDictData(DictDataSaveReqVO createReqVO);
 
     /**
      * 更新字典数据
      *
-     * @param reqVO 字典数据信息
+     * @param updateReqVO 字典数据信息
      */
-    void updateDictData(DictDataUpdateReqVO reqVO);
+    void updateDictData(DictDataSaveReqVO updateReqVO);
 
     /**
      * 删除字典数据
@@ -49,18 +47,18 @@ public interface DictDataService {
     /**
      * 获得字典数据分页列表
      *
-     * @param reqVO 分页请求
+     * @param pageReqVO 分页请求
      * @return 字典数据分页列表
      */
-    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO reqVO);
+    PageResult<DictDataDO> getDictDataPage(DictDataPageReqVO pageReqVO);
 
     /**
      * 获得字典数据列表
      *
-     * @param reqVO 列表请求
+     * @param dictType 字典类型
      * @return 字典数据列表
      */
-    List<DictDataDO> getDictDataList(DictDataExportReqVO reqVO);
+    List<DictDataDO> getEnabledDictDataListByType(String dictType);
 
     /**
      * 获得字典数据详情
@@ -84,7 +82,7 @@ public interface DictDataService {
      * 2. 字典数据被禁用
      *
      * @param dictType 字典类型
-     * @param values 字典数据值的数组
+     * @param values   字典数据值的数组
      */
     void validateDictDataList(String dictType, Collection<String> values);
 
@@ -92,7 +90,7 @@ public interface DictDataService {
      * 获得指定的字典数据
      *
      * @param dictType 字典类型
-     * @param value 字典数据值
+     * @param value    字典数据值
      * @return 字典数据
      */
     DictDataDO getDictData(String dictType, String value);
@@ -101,7 +99,7 @@ public interface DictDataService {
      * 解析获得指定的字典数据，从缓存中
      *
      * @param dictType 字典类型
-     * @param label 字典数据标签
+     * @param label    字典数据标签
      * @return 字典数据
      */
     DictDataDO parseDictData(String dictType, String label);

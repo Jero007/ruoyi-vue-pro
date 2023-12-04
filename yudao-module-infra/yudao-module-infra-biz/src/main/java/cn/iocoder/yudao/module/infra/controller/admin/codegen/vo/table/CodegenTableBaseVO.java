@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CodegenTableBaseVO {
 
-    @Schema(description = "生成场景,参见 CodegenSceneEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @Schema(description = "生成场景，参见 CodegenSceneEnum 枚举", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     @NotNull(message = "导入类型不能为空")
     private Integer scene;
 
@@ -57,5 +57,17 @@ public class CodegenTableBaseVO {
 
     @Schema(description = "父菜单编号", example = "1024")
     private Long parentMenuId;
+
+    @Schema(description = "主表的编号", example = "2048")
+    private Long masterTableId;
+    @Schema(description = "子表关联主表的字段编号", example = "4096")
+    private Long subJoinColumnId;
+    @Schema(description = "主表与子表是否一对多", example = "4096")
+    private Boolean subJoinMany;
+
+    @Schema(description = "树表的父字段编号", example = "8192")
+    private Long treeParentColumnId;
+    @Schema(description = "树表的名字字段编号", example = "16384")
+    private Long treeNameColumnId;
 
 }

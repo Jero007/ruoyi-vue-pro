@@ -4,10 +4,8 @@ import cn.iocoder.yudao.framework.common.enums.CommonStatusEnum;
 import cn.iocoder.yudao.framework.common.pojo.PageResult;
 import cn.iocoder.yudao.framework.common.util.collection.ArrayUtils;
 import cn.iocoder.yudao.framework.test.core.ut.BaseDbUnitTest;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataCreateReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataExportReqVO;
 import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataPageReqVO;
-import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataUpdateReqVO;
+import cn.iocoder.yudao.module.system.controller.admin.dict.vo.data.DictDataSaveReqVO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictDataDO;
 import cn.iocoder.yudao.module.system.dal.dataobject.dict.DictTypeDO;
 import cn.iocoder.yudao.module.system.dal.mysql.dict.DictDataMapper;
@@ -43,10 +41,15 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testGetDictDataList() {
         // mock 数据
-        DictDataDO dictDataDO01 = randomDictDataDO().setDictType("yunai").setSort(2);
+        DictDataDO dictDataDO01 = randomDictDataDO().setDictType("yunai").setSort(2)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         dictDataMapper.insert(dictDataDO01);
-        DictDataDO dictDataDO02 = randomDictDataDO().setDictType("yunai").setSort(1);
+        DictDataDO dictDataDO02 = randomDictDataDO().setDictType("yunai").setSort(1)
+                .setStatus(CommonStatusEnum.ENABLE.getStatus());
         dictDataMapper.insert(dictDataDO02);
+        DictDataDO dictDataDO03 = randomDictDataDO().setDictType("yunai").setSort(3)
+                .setStatus(CommonStatusEnum.DISABLE.getStatus());
+        dictDataMapper.insert(dictDataDO03);
         // 准备参数
 
         // 调用
@@ -87,34 +90,6 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
     }
 
     @Test
-    public void testGetDictDataList_export() {
-        // mock 数据
-        DictDataDO dbDictData = randomPojo(DictDataDO.class, o -> { // 等会查询到
-            o.setLabel("芋艿");
-            o.setDictType("yunai");
-            o.setStatus(CommonStatusEnum.ENABLE.getStatus());
-        });
-        dictDataMapper.insert(dbDictData);
-        // 测试 label 不匹配
-        dictDataMapper.insert(cloneIgnoreId(dbDictData, o -> o.setLabel("艿")));
-        // 测试 dictType 不匹配
-        dictDataMapper.insert(cloneIgnoreId(dbDictData, o -> o.setDictType("nai")));
-        // 测试 status 不匹配
-        dictDataMapper.insert(cloneIgnoreId(dbDictData, o -> o.setStatus(CommonStatusEnum.DISABLE.getStatus())));
-        // 准备参数
-        DictDataExportReqVO reqVO = new DictDataExportReqVO();
-        reqVO.setLabel("芋");
-        reqVO.setDictType("yunai");
-        reqVO.setStatus(CommonStatusEnum.ENABLE.getStatus());
-
-        // 调用
-        List<DictDataDO> list = dictDataService.getDictDataList(reqVO);
-        // 断言
-        assertEquals(1, list.size());
-        assertPojoEquals(dbDictData, list.get(0));
-    }
-
-    @Test
     public void testGetDictData() {
         // mock 数据
         DictDataDO dbDictData = randomDictDataDO();
@@ -131,8 +106,9 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
     @Test
     public void testCreateDictData_success() {
         // 准备参数
-        DictDataCreateReqVO reqVO = randomPojo(DictDataCreateReqVO.class,
-                o -> o.setStatus(randomCommonStatus()));
+        DictDataSaveReqVO reqVO = randomPojo(DictDataSaveReqVO.class,
+                o -> o.setStatus(randomCommonStatus()))
+                .setId(null); // 防止 id 被赋值
         // mock 方法
         when(dictTypeService.getDictType(eq(reqVO.getDictType()))).thenReturn(randomDictTypeDO(reqVO.getDictType()));
 
@@ -142,7 +118,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
         assertNotNull(dictDataId);
         // 校验记录的属性是否正确
         DictDataDO dictData = dictDataMapper.selectById(dictDataId);
-        assertPojoEquals(reqVO, dictData);
+        assertPojoEquals(reqVO, dictData, "id");
     }
 
     @Test
@@ -151,7 +127,7 @@ public class DictDataServiceImplTest extends BaseDbUnitTest {
         DictDataDO dbDictData = randomDictDataDO();
         dictDataMapper.insert(dbDictData);// @Sql: 先插入出一条存在的数据
         // 准备参数
-        DictDataUpdateReqVO reqVO = randomPojo(DictDataUpdateReqVO.class, o -> {
+        DictDataSaveReqVO reqVO = randomPojo(DictDataSaveReqVO.class, o -> {
             o.setId(dbDictData.getId()); // 设置更新的 ID
             o.setStatus(randomCommonStatus());
         });
